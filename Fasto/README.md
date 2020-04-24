@@ -42,13 +42,13 @@ since each can be time consuming I recomment that you only assign yourself to on
 - Add filter
 - Add scan
 
-### Part 3 - document p. 13
+### Part 3 - document p. 12
 Optimization part.
 Here we need to finish the following
 - Copy propagation
 - constant folding
 - dead-binding removal
 
-### Part 4 (Bonus)
+### Part 4 (Bonus) - document p. 13
 This is not mandatory, but could be nice to do.
 Implement Array comprehension
