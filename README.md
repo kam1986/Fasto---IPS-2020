@@ -1,6 +1,6 @@
 # Fasto 2020
 -----------------
-The documentation pdf can be found in Fasto---IPS-2020/Fasto/faso/doc, read it.
+The documentation pdf can be found in Fasto---IPS-2020/Fasto/fasto/doc, read it.
 
 ## Common rules (will be revisited)
 * If you get stuck and need to post an issue do so under 'Issues' above.
