@@ -42,7 +42,7 @@ since each can be time consuming I recomment that you only assign yourself to on
 - Add filter
 - Add scan
 
-### Part 3 
+### Part 3 - document p. 13
 Optimization part.
 Here we need to finish the following
 - Copy propagation
