@@ -1,0 +1,5 @@
+fun int f(int a, int b, int c, int d) = 1000*a + 100*b + 10*c + d;
+
+fun int main() =
+  let a = 1 in let b = 2 in let c = 3 in let d = 4
+  in f(d,a,b,c)
