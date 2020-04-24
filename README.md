@@ -10,7 +10,7 @@ The documentation pdf can be found in Fasto---IPS-2020/Fasto/fasto/doc, read it.
 * When done add a breaf comment below the task. Just so that we better can write the report later on.
 * Test your code.
 
-The first rule are also so that we can go back and look when writing the report such that we can highlight problems we had.
+The first rule are also so that we can go back and look when writing the report such that we can highlight problems we have had.
 
 ###### OBS: Visual studio code has syntaxs highlight for fsLexYacc (rename .fsp -> .fsy)
 
