@@ -7,7 +7,7 @@ The documentation pdf can be found in Fasto---IPS-2020/Fasto/fasto/doc, read it.
 * Before you start editing any code, BRANCH!!! This help us use it, Github do not save changes 'one to one'
 * Before you merge to master make sure the code works.
 * Below you will find a TODO list, before starting mark the part you are working on with, your such that we don't do double work, and mark it with a -DONE- when finished but do not remove your name (to know where to go if something starnge happens)
-* When done add a breaf comment below the after the task. Just so that we better can write the report later on.
+* When done add a breaf comment below the task. Just so that we better can write the report later on.
 * Test your code.
 
 The first rule are also so that we can go back and look when writing the report such that we can highlight problems we had.
