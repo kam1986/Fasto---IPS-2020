@@ -1,7 +1,7 @@
 # this is the gitignore file
 
 #ignore individual assignment folder
-../Assignments/
+../Assignments/*
 #ignore everything in the fasto/bin/ directory
 fasto/bin/*.dll
 fasto/bin/*.fs
