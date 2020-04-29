@@ -24,6 +24,8 @@ The following points are to be implemented in the Lexer, Parser, interpreter, ty
 - Add the following operators *, /, &&, ||, ~, and not
 - Add boolean values i.e. true, and false
 
+In making by Kasper
+
 #### b - document p. 12
 In the Lexer and Parser do the following.
 expand both such that the compiler/inteperter accept the following line of code
