@@ -19,12 +19,12 @@ Now lets have fun
 ## TODO
 -----------------------------------------------------------------------------------------------------------------------------
 ### Part 1
+a and b are in the making by Kasper 
 #### a - document p. 11
 The following points are to be implemented in the Lexer, Parser, interpreter, type checker, and Mips code generator.
 - Add the following operators *, /, &&, ||, ~, and not
 - Add boolean values i.e. true, and false
 
-In making by Kasper
 
 #### b - document p. 12
 In the Lexer and Parser do the following.
