@@ -1,0 +1,12 @@
+# this is the gitignore file
+
+#ignore everything in the fasto/bin/ directory
+fasto/bin/*.dll
+fasto/bin/*.fs
+fasto/bin/Parser.fsyacc.output
+fasto/bin/Parser.fsi
+fasto/bin/Fasto.exe
+
+#remove test result and generated assembly files
+fasto/tests/*.asm
+fasto/tests/*.out-testresult
