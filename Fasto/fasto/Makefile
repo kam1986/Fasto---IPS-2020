@@ -40,8 +40,8 @@ all: $(FastoExe)
 $(LexerGen): src/Lexer.fsl
 	$(fslex) src/Lexer.fsl -o $(LexerGen)
 
-$(ParserGen): src/Parser.fsp
-	$(fsyacc) -v --module Parser src/Parser.fsp -o $(ParserGen)
+$(ParserGen): src/Parser.fsy
+	$(fsyacc) -v --module Parser src/Parser.fsy -o $(ParserGen)
 
 $(AbSynLib): src/AbSyn.fs
 	$(fsharpc) -a src/AbSyn.fs -o $(AbSynLib)
