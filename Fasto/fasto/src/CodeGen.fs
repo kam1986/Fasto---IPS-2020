@@ -263,17 +263,34 @@ let rec compileExp  (e      : TypedExp)
      version, but remember to come back and clean it up later.
      `Not` and `Negate` are simpler; you can use `Mips.XORI` for `Not`
   *)
-  | Times (_, _, _) ->
-      failwith "Unimplemented code generation of multiplication"
+  | Times (e1, e2, pos) ->
+      let t1 = newReg "times_L"
+      let t2 = newReg "times_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      code1 @ code2 @ [Mips.MUL (place,t1,t2)]
 
-  | Divide (_, _, _) ->
-      failwith "Unimplemented code generation of division"
+  | Divide (e1, e2, pos) ->
+      let t1 = newReg "divide_L"
+      let t2 = newReg "divide_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      code1 @ code2 @ [Mips.DIV (place,t1,t2)]
 
-  | Not (_, _) ->
-      failwith "Unimplemented code generation of not"
+  | Not (e, pos) ->
+      let t = newReg "not"
+      let code = compileExp e vtable t1
+      code @ [Mips.XORI (place, t, "1")] //  1 ^ 1 = 0, 0^1 = 1  
+
+
 
   | Negate (_, _) ->
-      failwith "Unimplemented code generation of negate"
+      let t = newReg "not"
+      let code = compileExp e vtable t1
+      // -1 are equevalent to all bits set and XOR will therefore flip all bits of t
+      // since this signed integers are unsymetric around 0 (bit representation)
+      // we need to add 1 to the result. 
+      code @ [Mips.XORI (place, t, "-1"); Mips.ADDI (place, place, "1")]   
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
