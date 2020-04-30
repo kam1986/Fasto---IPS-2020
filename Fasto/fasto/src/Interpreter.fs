@@ -162,18 +162,49 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
               evaluates to false.
   *)
-  | Times(_, _, _) ->
-        failwith "Unimplemented interpretation of multiplication"
-  | Divide(_, _, _) ->
-        failwith "Unimplemented interpretation of division"
-  | And (_, _, _) ->
-        failwith "Unimplemented interpretation of &&"
-  | Or (_, _, _) ->
-        failwith "Unimplemented interpretation of ||"
-  | Not(_, _) ->
-        failwith "Unimplemented interpretation of not"
-  | Negate(_, _) ->
-        failwith "Unimplemented interpretation of negate"
+  | Times(e1, e2, pos) ->
+        let res1   = evalExp(e1, vtab, ftab)
+        let res2   = evalExp(e2, vtab, ftab)
+        match (res1, res2) with
+          | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
+          | _ -> invalidOperands "Multiply on non-integral args: " [(Int, Int)] res1 res2 pos
+  | Divide(e1, e2, pos) ->
+        let res1   = evalExp(e1, vtab, ftab)
+        let res2   = evalExp(e2, vtab, ftab)
+        match (res1, res2) with
+          | (        _, IntVal 0)  -> invalidOperands "Division with zero error: " [(Int,Int)] res1 res2 pos
+          | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
+          | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos
+  | And (e1, e2, pos) ->
+        let res1   = evalExp(e1, vtab, ftab)
+        match res1 with
+        | BoolVal false -> res1
+        | BoolVal _ -> // short curcuit part
+            let res2 = evalExp(e2, vtab, ftab)
+            match res2 with
+            | BoolVal false -> res1
+            | _ -> invalidOperands "And on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
+        | _ ->  invalidOperand "And on non-boolean arg: " Bool res1 pos
+  | Or (e1, e2, pos) ->
+        let res1   = evalExp(e1, vtab, ftab)
+        match res1 with
+        | BoolVal true -> res1
+        | BoolVal _ -> 
+           let res2   = evalExp(e2, vtab, ftab)
+           match res2 with
+           | BoolVal true -> res1
+           | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
+        | _ ->  invalidOperand "Or on non-boolean arg: " Bool res1 pos
+  | Not(e, pos) ->
+    let res1 = evalExp(e, vtab, ftab)
+    match res1 with
+    | BoolVal b -> not b |> BoolVal
+    | _ -> invalidOperand "Not on non-boolean arg: " Bool res1 pos
+  | Negate(e, pos) ->
+    let res1 = evalExp(e, vtab, ftab)
+    match res1 with
+    | IntVal n -> -n |> IntVal
+    | _ -> invalidOperand "Negate on non-integral arg: " Int res1 pos
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         let r2 = evalExp(e2, vtab, ftab)
