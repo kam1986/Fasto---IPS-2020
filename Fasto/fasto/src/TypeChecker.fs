@@ -147,7 +147,7 @@ and checkExp  (ftab : FunTable)
 
     | Not (e, pos) ->
         let t, e_dec = checkExp ftab vtab e
-        if t <> Int then reportTypeWrong "argument of ~ " Bool t pos
+        if t <> Bool then reportTypeWrong "argument of ~ " Bool t pos
         (Bool, Not(e_dec, pos))
         
         

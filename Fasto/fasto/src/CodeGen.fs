@@ -193,9 +193,9 @@ let rec compileExp  (e      : TypedExp)
       else
         [ Mips.LUI (place, n / 65536)
         ; Mips.ORI (place, place, n % 65536) ]
-  | Constant (BoolVal p, _) ->
-      (* TODO project task 1: represent `true`/`false` values as `1`/`0` *)
-      failwith "Unimplemented code generation of boolean constants"
+  | Constant (BoolVal p, pos) ->
+      if p then [Mips.LI(place, 1)] else [Mips.LI(place, 0)]
+      
   | Constant (CharVal c, pos) -> [ Mips.LI (place, int c) ]
 
   (* Create/return a label here, collect all string literals of the program
@@ -279,18 +279,18 @@ let rec compileExp  (e      : TypedExp)
 
   | Not (e, pos) ->
       let t = newReg "not"
-      let code = compileExp e vtable t1
-      code @ [Mips.XORI (place, t, "1")] //  1 ^ 1 = 0, 0^1 = 1  
+      let code = compileExp e vtable t
+      code @ [Mips.XORI (place, t, 1)] //  1 ^ 1 = 0, 0^1 = 1  
 
 
 
-  | Negate (_, _) ->
-      let t = newReg "not"
-      let code = compileExp e vtable t1
+  | Negate (e, pos) ->
+      let t = newReg "netage"
+      let code = compileExp e vtable t
       // -1 are equevalent to all bits set and XOR will therefore flip all bits of t
       // since this signed integers are unsymetric around 0 (bit representation)
       // we need to add 1 to the result. 
-      code @ [Mips.XORI (place, t, "-1"); Mips.ADDI (place, place, "1")]   
+      code @ [Mips.XORI (place, t, -1); Mips.ADDI (place, place, 1)]   
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
@@ -437,11 +437,27 @@ let rec compileExp  (e      : TypedExp)
         in `e1 || e2` if the execution of `e1` will evaluate to `true` then
         the code of `e2` must not be executed. Similarly for `And` (&&).
   *)
-  | And (_, _, _) ->
-      failwith "Unimplemented code generation of &&"
+  | And (e1, e2, pos) ->
+      let t1 = newReg "and_L"
+      let t2 = newReg "and_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      let falseLabel = newLab "false"
+      code1 @ 
+      [ Mips.LI (place, 0); Mips.BEQ (t1, place, falseLabel)]
+      @ code2 @ 
+      [ Mips.BEQ (t2, place, falseLabel); Mips.LI(place, 1); Mips.LABEL falseLabel]
 
-  | Or (_, _, _) ->
-      failwith "Unimplemented code generation of ||"
+  | Or (e1, e2, pos) ->
+      let t1 = newReg "or_L"
+      let t2 = newReg "or_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      let trueLabel = newLab "true"
+      code1 @ 
+      [ Mips.LI (place, 1); Mips.BEQ (t1, place, trueLabel)] 
+      @ code2 @
+      [ Mips.BEQ (t2, place, trueLabel); Mips.LI (place, 0); Mips.LABEL trueLabel]
 
   (* Indexing:
      1. generate code to compute the index
