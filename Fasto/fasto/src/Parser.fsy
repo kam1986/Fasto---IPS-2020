@@ -36,19 +36,29 @@ let parse_error_rich =
 //   TODO: project task 4: array comprehension
 //////////////////////////////////////////////////////////////////////
 
+
 %token <int*(int*int)> NUM
+%token <bool*(int*int)> BOOLLIT
 %token <char*(int*int)> CHARLIT
 %token <string*(int*int)> ID STRINGLIT
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS
+%token <(int*int)> TIMES DIVIDE
+%token <(int*int)> AND OR
+%token <(int*int)> NOT NEG
 %token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW REPLICATE FILTER
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
+%left OR
+%left AND
+%left NOT
 %left DEQ LTH
 %left PLUS MINUS
+%left TIMES DIVIDE
+%left NEG
 
 %start Prog
 %type <AbSyn.UntypedProg> Prog
@@ -95,6 +105,13 @@ BinOp : PLUS  { (Lambda
                                         $1) ,$1))}
 ;
 
+// Task 1 part 2
+MulIn : SEMICOLON ID EQ Exp MulIn %prec letprec
+        { Let (Dec (fst $2, $4, $3), $5, $1)}
+      | IN Exp
+        { $2 }
+
+
 ///////////////////////////////////////////////////////
 // TODO: project tasks 1,2,4:
 //       add grammer rules for the new expressions
@@ -102,12 +119,24 @@ BinOp : PLUS  { (Lambda
 
 Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | CHARLIT        { Constant (CharVal (fst $1), snd $1) }
+    | BOOLLIT        { Constant (BoolVal (fst $1), snd $1) }
     | ID             { Var $1 }
     | STRINGLIT      { StringLit $1 }
     | LCURLY Exps RCURLY
                      { ArrayLit ($2, (), $1) }
     | Exp PLUS  Exp  { Plus ($1, $3, $2) }
     | Exp MINUS Exp  { Minus($1, $3, $2) }
+
+    // Task 1 Part a $1 are the left subexpression $2 are the position from OR
+    // $3 are the right subexpression
+    | Exp TIMES  Exp  { Times ($1, $3, $2) }
+    | Exp DIVIDE Exp  { Divide ($1, $3, $2) }
+    | Exp AND  Exp    { And ($1, $3, $2) }
+    | Exp OR   Exp    { Or ($1, $3, $2) }
+    | NOT Exp         { Not ($2, $1) }
+    | NEG Exp         { Negate ($2, $1) }
+
+
     | Exp DEQ   Exp  { Equal($1, $3, $2) }
     | Exp LTH   Exp  { Less ($1, $3, $2) }
     | IF Exp THEN Exp ELSE Exp %prec ifprec
@@ -137,8 +166,9 @@ Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
                      { Filter ($3, $5, (), $1) }
 
     // TODO: task 1(b): replace this with a more general production
-    | LET ID EQ Exp IN Exp %prec letprec
-                     { Let (Dec (fst $2, $4, $3), $6, $1) }
+    | LET ID EQ Exp MulIn %prec letprec
+                     { Let (Dec (fst $2, $4, $3), $5, $1) }
+
     | ID LBRACKET Exp RBRACKET
                      { Index (fst $1, $3, (), $2) }
 ;

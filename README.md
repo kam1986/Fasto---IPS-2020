@@ -19,10 +19,18 @@ Now lets have fun
 ## TODO
 -----------------------------------------------------------------------------------------------------------------------------
 ### Part 1
+a and b are in the making by Kasper 
 #### a - document p. 11
 The following points are to be implemented in the Lexer, Parser, interpreter, type checker, and Mips code generator.
 - Add the following operators *, /, &&, ||, ~, and not
 - Add boolean values i.e. true, and false
+
+Comment on implementation:
+general note : I have looked at the implementation (typechecker.fs) of checkBinOp to find out how to check negate and not else copy pasted (all files) with small alterations to the four others.
+
+Lexer and parser : added the patterns and tokens part (a) needing part (b)
+Intepreter : added part (a) Done. Checked that short circuit works. (line 178-197)
+TypeChecker
 
 #### b - document p. 12
 In the Lexer and Parser do the following.
