@@ -30,7 +30,7 @@ expand both such that the compiler/inteperter accept the following line of code
 ```fsharp
 let x = 3; y = 2*x; z= iota(y+4) in write(z)
 ```
-This should be the equavivalent of 
+This should be the equavivalent of
 ```fsharp
 let x = 3 in let y = 2*x in let z = iota(y+4) in rwite(z)
 ```
@@ -40,6 +40,14 @@ This task include adding tokens in the Lexer and adding and/or changing nontermi
 Implement replicate, filter and scan. This goes for all phases from lexer to Mips code generator.
 since each can be time consuming I recomment that you only assign yourself to only one at a time.
 - Add replicate
+	- **Finished tasks**
+		- Added parsing and lexing functionality
+		- The Fasto interpreter now supports the ``replicate`` function
+	- **To do**
+		- Type checking
+		- Machine code generation / compilation
+		- Thorough testing
+		- Probably more...
 - Add filter
 - Add scan
 
