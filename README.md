@@ -44,6 +44,7 @@ since each can be time consuming I recomment that you only assign yourself to on
 		- Added parsing and lexing functionality
 		- The Fasto interpreter now supports the ``replicate`` function
 	- **To do**
+		- INTERPRETER: Add support for arrays (see interpreter.fs)
 		- Type checking
 		- Machine code generation / compilation
 		- Thorough testing
