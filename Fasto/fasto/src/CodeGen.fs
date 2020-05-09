@@ -193,7 +193,7 @@ let rec compileExp  (e      : TypedExp)
       else
         [ Mips.LUI (place, n / 65536)
         ; Mips.ORI (place, place, n % 65536) ]
-  | Constant (BoolVal p, pos) ->
+  | Constant (BoolVal p, pos) -> // load either imm = 1 or imm = 0 to reg = place
       if p then [Mips.LI(place, 1)] else [Mips.LI(place, 0)]
       
   | Constant (CharVal c, pos) -> [ Mips.LI (place, int c) ]
