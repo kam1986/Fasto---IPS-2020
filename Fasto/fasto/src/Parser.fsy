@@ -23,7 +23,7 @@ let parse_error_rich =
 // TODO: Add new (lexer) token definitions:
 //
 //   TODO: project task 1 :
-//     - multiplication (*), division (/), numerical negation (~), 
+//     - multiplication (*), division (/), numerical negation (~),
 //       logical negation (not), logical and (&&), logical or (||),
 //       boolean literals (true, false)
 //     - add the required precedence and associativity rules for
@@ -31,9 +31,9 @@ let parse_error_rich =
 //     - generalize the syntax of let-expressions to allow
 //       multiple variable declarations
 //
-//   TODO: project task 2: replicate, filter, scan 
+//   TODO: project task 2: replicate, filter, scan
 //
-//   TODO: project task 4: array comprehension 
+//   TODO: project task 4: array comprehension
 //////////////////////////////////////////////////////////////////////
 
 %token <int*(int*int)> NUM
@@ -42,7 +42,7 @@ let parse_error_rich =
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS
-%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW
+%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW REPLICATE
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
@@ -96,7 +96,7 @@ BinOp : PLUS  { (Lambda
 ;
 
 ///////////////////////////////////////////////////////
-// TODO: project tasks 1,2,4: 
+// TODO: project tasks 1,2,4:
 //       add grammer rules for the new expressions
 ///////////////////////////////////////////////////////
 
@@ -128,6 +128,11 @@ Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | REDUCE LPAR OP BinOp COMMA Exp COMMA Exp RPAR
                      { Reduce ($4, $6, $8, (), $1) }
     | LPAR Exp RPAR  { $2 }
+
+    // FOR TASK 2
+
+    | REPLICATE LPAR Exp COMMA Exp RPAR
+                     { Replicate ($3, $5, (), $1) }
     // TODO: task 1(b): replace this with a more general production
     | LET ID EQ Exp IN Exp %prec letprec
                      { Let (Dec (fst $2, $4, $3), $6, $1) }

@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////
-// TODO: project task 1 
-//   implement lexer tokens for the new operators: 
-//   multiplication (*), division (/), numerical negation (~), 
+// TODO: project task 1
+//   implement lexer tokens for the new operators:
+//   multiplication (*), division (/), numerical negation (~),
 //   logical negation (not), logical and (&&), logical or (||),
 //   boolean literals (true, false), semicolon (;)
 //
 //
-// TODO: project task 2 
-//   implement lexer tokens (keywords) for replicate, filter, scan 
+// TODO: project task 2
+//   implement lexer tokens (keywords) for replicate, filter, scan
 //
 //
-// TODO: project task 4 
-//   implement the lexer tokens (keywords) for array comprehension 
+// TODO: project task 4
+//   implement the lexer tokens (keywords) for array comprehension
 ////////////////////////////////////////////////////////////////////
 
 
@@ -69,7 +69,9 @@ let keyword (s, pos) =
        | "map"          -> Parser.MAP  pos
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
-       | "write"        -> Parser.WRITE pos
+       | "write"
+       // For Task 2
+       | "replicate"    -> Parser.REPLICATE pos
        | _              -> Parser.ID (s, pos)
 
 }

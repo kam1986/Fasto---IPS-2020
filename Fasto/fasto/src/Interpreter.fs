@@ -265,8 +265,29 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
          the value of `a`; otherwise raise an error (containing
          a meaningful message).
   *)
-  | Replicate (_, _, _, _) ->
-        failwith "Unimplemented interpretation of replicate"
+  | Replicate (n_arg, a_arg, _, pos) ->
+        let a = evalExp(a_arg, vtab, ftab)
+        let n = evalExp(n_arg, vtab, ftab)
+
+        // check that `n` evaluates to an integer value >= 0
+        //if(TypeMatch (int, n)) then
+          // 'n' is an int.
+        match n with
+          | IntVal nInt ->
+            if nInt < 0 then failwith "n needs to be >= 0!"
+            else
+              match a with
+                | IntVal _ ->
+                  ArrayVal ((List.init nInt (fun i -> a)), Int)
+                | CharVal _ ->
+                  ArrayVal ((List.init nInt (fun i -> a)), Char)
+                | BoolVal _ ->
+                  ArrayVal ((List.init nInt (fun i -> a)), Bool)
+                // TODO: Add support for arrays
+                // | ArrayVal _ ->
+                //   ArrayVal ((List.init nInt (fun i -> a)), Array )
+                | _ -> failwith "Invalid type for a!"
+          | _ -> failwith "n needs to be an INT!"
 
   (* TODO project task 2: `filter(p, arr)`
        pattern match the implementation of map:
