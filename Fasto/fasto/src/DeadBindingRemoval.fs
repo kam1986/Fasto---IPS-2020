@@ -130,7 +130,7 @@ let rec removeDeadBindingsInExp (e : TypedExp) : (bool * DBRtab * TypedExp) =
             if not (isUsed name stab)
             then ret
             else
-                let bval', stab', e' = removeDeadBindingsInExp e'
+                let bval', stab', e' = removeDeadBindingsInExp e
                 (
                     bval || bval',
                     SymTab.combine stab stab',
