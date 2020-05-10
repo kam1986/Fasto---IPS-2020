@@ -5,6 +5,7 @@ module DeadBindingRemoval
 *)
 
 open AbSyn
+open SymTab
 
 type DBRtab = SymTab.SymTab<unit>
 
@@ -68,7 +69,8 @@ let rec removeDeadBindingsInExp (e : TypedExp) : (bool * DBRtab * TypedExp) =
                         you need to record it in a new symbol table.
                   - 3rd element of the tuple: should be the optimised expression.
             *)
-            failwith "Unimplemented removeDeadBindingsInExp for Var"
+            (false, recordUse name (SymTab.empty()), e)
+            // failwith "Unimplemented removeDeadBindingsInExp for Var"
         | Plus (x, y, pos) ->
             let (xios, xuses, x') = removeDeadBindingsInExp x
             let (yios, yuses, y') = removeDeadBindingsInExp y
@@ -118,9 +120,22 @@ let rec removeDeadBindingsInExp (e : TypedExp) : (bool * DBRtab * TypedExp) =
                         expression `e` and to propagate its results (in addition
                         to recording the use of `name`).
             *)
-            failwith "Unimplemented removeDeadBindingsInExp for Index"
+            let bval, stab, e' = removeDeadBindingsInExp e
+            (bval, recordUse name stab, e')
+
+            // failwith "Unimplemented removeDeadBindingsInExp for Index"
 
         | Let (Dec (name, e, decpos), body, pos) ->
+            let (bval, stab, body') as ret = removeDeadBindingsInExp body
+            if not (isUsed name stab)
+            then ret
+            else
+                let bval', stab', e' = removeDeadBindingsInExp e'
+                (
+                    bval || bval',
+                    SymTab.combine stab stab',
+                    Let (Dec (name, e', decpos), body', pos)
+                )
             (* Task 3, Hints for the `Let` case:
                   - recursively process the `body` of the let-binding.
                   - if `name` was not found to have been used in `body`
@@ -135,7 +150,7 @@ let rec removeDeadBindingsInExp (e : TypedExp) : (bool * DBRtab * TypedExp) =
                       -- construct the the new `Let` expression from
                          the resulted optimized subexpressions.
             *)
-            failwith "Unimplemented removeDeadBindingsInExp for Let"
+            // failwith "Unimplemented removeDeadBindingsInExp for Let"
         | Iota (e, pos) ->
             let (io, uses, e') = removeDeadBindingsInExp e
             (io,
