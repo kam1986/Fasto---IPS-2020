@@ -183,17 +183,17 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
             let res2 = evalExp(e2, vtab, ftab)
             match res2 with
             | BoolVal false -> res1
-            | _ -> invalidOperands "And on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
+            | _ -> invalidOperands "And on non-boolean args: " [(Bool, Bool)] res1 res2 pos
         | _ ->  invalidOperand "And on non-boolean arg: " Bool res1 pos
   | Or (e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         match res1 with
         | BoolVal true -> res1
-        | BoolVal _ -> 
+        | BoolVal _ ->
            let res2   = evalExp(e2, vtab, ftab)
            match res2 with
            | BoolVal true -> res1
-           | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
+           | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos
         | _ ->  invalidOperand "Or on non-boolean arg: " Bool res1 pos
   | Not(e, pos) ->
     let res1 = evalExp(e, vtab, ftab)
@@ -328,29 +328,29 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
          under predicate `p`, i.e., `p(a) = true`;
        - create an `ArrayVal` from the (list) result of the previous step.
   *)
-  | Filter (funArg, arrExp, _, pos) ->
-        let farg_ret_type = rtpFunArg funArg ftab pos
-        let arr = evalExp(arrExp, vtab, ftab)
-
-        // check that the function `p` result type (use `rtpFunArg`) is bool;
-        match farg_ret_type with
-          | Bool _ ->
-            match arr with
-              // evaluate `arr` and check that the (value) result corresponds to an array;
-              | ArrayVal(lst, tp) ->
-                 // use F# `List.filter` to keep only the elements `a` of `arr` which succeed
-                 // under predicate `p`, i.e., `p(a) = true`;
-                 let mlst = lst |> List.filter (fun x ->
-                   match evalFunArg (funArg, vtab, ftab, pos, [x]) with
-                    | BoolVal funEval -> funEval
-                    )
-
-                 // create an `ArrayVal` from the (list) result of the previous step.
-                 ArrayVal (mlst, farg_ret_type)
-
-              // 'arr' is not an array. Raise error.
-              | _ -> raise (MyError("The second argument needs to be an array!"+ppVal 0 arr, pos))
-          | otherwise -> raise (MyError( "Function given in first argument must return a BOOL: "+ppVal 0 arr, pos))
+  //| Filter (funArg, arrExp, _, pos) ->
+  //      let farg_ret_type = rtpFunArg funArg ftab pos
+  //      let arr = evalExp(arrExp, vtab, ftab)
+//
+  //      // check that the function `p` result type (use `rtpFunArg`) is bool;
+  //      match farg_ret_type with
+  //        | Bool _ ->
+  //          match arr with
+  //            // evaluate `arr` and check that the (value) result corresponds to an array;
+  //            | ArrayVal(lst, tp) ->
+  //               // use F# `List.filter` to keep only the elements `a` of `arr` which succeed
+  //               // under predicate `p`, i.e., `p(a) = true`;
+  //               let mlst = lst |> List.filter (fun x ->
+  //                 match evalFunArg (funArg, vtab, ftab, pos, [x]) with
+  //                  | BoolVal funEval -> funEval
+  //                  )
+//
+  //               // create an `ArrayVal` from the (list) result of the previous step.
+  //               ArrayVal (mlst, farg_ret_type)
+//
+  //            // 'arr' is not an array. Raise error.
+  //            | _ -> raise (MyError("The second argument needs to be an array!"+ppVal 0 arr, pos))
+  //        | otherwise -> raise (MyError( "Function given in first argument must return a BOOL: "+ppVal 0 arr, pos))
 
 
   (* TODO project task 2: `scan(f, ne, arr)`
