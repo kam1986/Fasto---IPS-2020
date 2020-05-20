@@ -149,14 +149,14 @@ and checkExp  (ftab : FunTable)
         let t, e_dec = checkExp ftab vtab e
         if t <> Bool then reportTypeWrong "argument of ~ " Bool t pos
         (Bool, Not(e_dec, pos))
-        
-        
+
+
 
     | Negate (e, pos) ->
         let t, e_dec = checkExp ftab vtab e
         if t <> Int then reportTypeWrong "argument of ~ " Int t pos
         (Int, Negate(e_dec, pos))
-        
+
     (* The types for e1, e2 must be the same. The result is always a Bool. *)
     | Equal (e1, e2, pos) ->
         let  (t1, e1') = checkExp ftab vtab e1
@@ -304,9 +304,7 @@ and checkExp  (ftab : FunTable)
         - assuming `a` is of type `t` the result type
           of replicate is `[t]`
     *)
-    | Replicate (_, _, _, _) ->
-        failwith "Unimplemented type check of replicate"
-
+    | Replicate (_,_,_,_) -> failwith "REPLICATE - unimplemented type check"
     (* TODO project task 2: Hint for `filter(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`
         and think of what needs to be changed for filter (?)
@@ -316,8 +314,24 @@ and checkExp  (ftab : FunTable)
             - `arr` should be of type `[ta]`
             - the result of filter should have type `[tb]`
     *)
-    | Filter (_, _, _, _) ->
-        failwith "Unimplemented type check of map"
+    | Filter (f, arr_exp, _, pos) ->
+        let (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
+        let elem_type =
+            match arr_type with
+              | Array t -> t
+              | _ -> reportTypeWrongKind "second argument of map" "array" arr_type pos
+        let (f', f_res_type, f_arg_type) =
+            match checkFunArg ftab vtab pos f with
+              | (f', res, [a1]) -> (f', res, a1)
+              | (_, res, args) ->
+                   reportArityWrong "first argument of map" 1 (args,res) pos
+        if elem_type <> f_arg_type then
+          reportTypesDifferent "function-argument and array-element types in map"
+                               f_arg_type elem_type pos
+        if f_res_type <> Bool then
+          reportTypeWrongKind "function result" "bool" f_res_type pos
+
+        (Array f_res_type, Map (f', arr_exp_dec, elem_type, f_res_type, pos))
 
     (* TODO project task 2: `scan(f, ne, arr)`
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.
