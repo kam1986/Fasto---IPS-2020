@@ -313,15 +313,9 @@ and checkExp  (ftab : FunTable)
         if n_type <> Int then
           reportTypeWrongKind "first argument" "int" n_type pos
 
-        // check type of 'a'
-        let elem_type =
-            match a_type with
-              | Array t -> t
-              | _ -> reportTypeWrongKind "second argument" "array" a_type pos
-
         // assuming `a` is of type `t` the result type
         // of replicate is `[t]`
-        (Array a_type, Replicate (n_dec, a_dec, elem_type, pos))
+        (Array a_type, Replicate (n_dec, a_dec, _, pos))
 
 
 
