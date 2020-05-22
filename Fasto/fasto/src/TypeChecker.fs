@@ -304,7 +304,25 @@ and checkExp  (ftab : FunTable)
         - assuming `a` is of type `t` the result type
           of replicate is `[t]`
     *)
-    | Replicate (_,_,_,_) -> failwith "REPLICATE - unimplemented type check"
+    | Replicate (n_arg,a_arg,_,pos) ->
+        // recursively type check `n` and `a`
+        let (n_type, n_dec) = checkExp ftab vtab n_arg
+        let (a_type, a_dec) = checkExp ftab vtab a_arg
+
+        // check that `n` has integer type
+        if n_type <> Int then
+          reportTypeWrongKind "first argument" "int" n_type pos
+
+        // check type of 'a'
+        let elem_type =
+            match a_type with
+              | Array t -> t
+              | _ -> reportTypeWrongKind "second argument" "array" a_type pos
+
+        (Array a_type, Replicate (n_dec, a_dec, elem_type, pos))
+
+
+
     (* TODO project task 2: Hint for `filter(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`
         and think of what needs to be changed for filter (?)
@@ -331,7 +349,7 @@ and checkExp  (ftab : FunTable)
         if f_res_type <> Bool then
           reportTypeWrongKind "function result" "bool" f_res_type pos
 
-        (Array f_res_type, Map (f', arr_exp_dec, elem_type, f_res_type, pos))
+        (Array f_res_type, Filter (f', arr_exp_dec, elem_type, f_res_type, pos))
 
     (* TODO project task 2: `scan(f, ne, arr)`
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.
