@@ -319,6 +319,8 @@ and checkExp  (ftab : FunTable)
               | Array t -> t
               | _ -> reportTypeWrongKind "second argument" "array" a_type pos
 
+        // assuming `a` is of type `t` the result type
+        // of replicate is `[t]`
         (Array a_type, Replicate (n_dec, a_dec, elem_type, pos))
 
 

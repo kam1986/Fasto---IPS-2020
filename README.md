@@ -19,7 +19,7 @@ Now lets have fun
 ## TODO
 -----------------------------------------------------------------------------------------------------------------------------
 ### Part 1
-a and b are in the making by Kasper 
+a and b are in the making by Kasper
 #### a - document p. 11
 The following points are to be implemented in the Lexer, Parser, interpreter, type checker, and Mips code generator.
 - Add the following operators *, /, &&, ||, ~, and not
@@ -51,9 +51,10 @@ since each can be time consuming I recomment that you only assign yourself to on
 	- **Finished tasks**
 		- Added parsing and lexing functionality
 		- The Fasto interpreter now supports the ``replicate`` function
+		- Type-checking implemented for REPLICATE and FILTER
 	- **To do**
 		- INTERPRETER: Add support for arrays (see interpreter.fs)
-		- Type checking
+		- Type checking (SCAN)
 		- Machine code generation / compilation
 		- Thorough testing
 		- Probably more...
