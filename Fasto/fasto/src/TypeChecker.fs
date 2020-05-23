@@ -315,7 +315,7 @@ and checkExp  (ftab : FunTable)
 
         // assuming `a` is of type `t` the result type
         // of replicate is `[t]`
-        (Array a_type, Replicate (n_dec, a_dec, _, pos))
+        (Array a_type, Replicate (n_dec, a_dec, a_type, pos))
 
 
 
@@ -345,7 +345,7 @@ and checkExp  (ftab : FunTable)
         if f_res_type <> Bool then
           reportTypeWrongKind "function result" "bool" f_res_type pos
 
-        (Array f_res_type, Filter (f', arr_exp_dec, elem_type, f_res_type, pos))
+        (Array f_res_type, Filter (f', arr_exp_dec, elem_type, pos))
 
     (* TODO project task 2: `scan(f, ne, arr)`
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.

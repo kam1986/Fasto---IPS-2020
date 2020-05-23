@@ -653,8 +653,54 @@ let rec compileExp  (e      : TypedExp)
         If `n` is less than `0` then remember to terminate the program with
         an error -- see implementation of `iota`.
   *)
-  | Replicate (_, _, _, _) ->
-      failwith "Unimplemented code generation of replicate"
+  | Replicate (n_exp, a_exp, a_type, pos) ->
+    // Get the size of one element in 'a'
+    let a_elem_size =
+      match a_type with
+        | Char -> 1
+        | Int  -> 4
+        | Bool -> 1
+        | _    -> failwith "Bad type for a"
+
+    // Make registers
+    let size_reg = newReg "size_reg"
+    let a_reg = newReg "a_reg"
+    //let place = newReg "place"
+    let addr_reg = newReg "addr_reg"
+    let i_reg = newReg "i_reg"
+    let i_lt_n = newReg "i_lt_n"  // 'i' less than 'n'
+
+    // Make labels
+    let loop_beg = newLab "loop_beg"
+    let loop_end = newLab "loop_end"
+
+    // Initialize registers
+    let n_code = compileExp n_exp vtable size_reg
+    let a_code = compileExp a_exp vtable a_reg
+
+    // let reg_init = [Mips.MOVE (i_reg, RZ)]
+    let reg_init = [Mips.MOVE (i_reg, RZ)
+                    ; Mips.ADDI (addr_reg, place, 0)
+                    ]
+
+    let loop_header = [ Mips.LABEL (loop_beg)
+                      ; Mips.SLT (i_lt_n, i_reg, size_reg)
+                      ; Mips.BEQ (i_lt_n, RZ, loop_end)
+                      ]
+
+    // let loop_body = [ Mips.ADDI (place, place, a_elem_size)
+    let loop_body = [ Mips.ADDI (addr_reg, addr_reg, a_elem_size)
+                    // ; (if a_elem_size = 4 then Mips.SW(a_reg, place, 0) else Mips.SB(a_reg, place, 0))
+                    ; (if a_elem_size = 4 then Mips.SW(a_reg, addr_reg, 0) else Mips.SB(a_reg, addr_reg, 0))
+                    ; Mips.ADDI (i_reg, i_reg, 1)
+                    ]
+
+    let loop_footer = [ Mips.J (loop_beg)
+                      ; Mips.LABEL (loop_end)
+                      ]
+
+    // n_code @ a_code @ [Mips.ADDI (size_reg, size_reg, 1)] @ dynalloc (size_reg, place, a_type) @ [Mips.ADDI (place, place, 0)] @ reg_init @ loop_header @ loop_body @ loop_footer
+    n_code @ a_code @ dynalloc (size_reg, place, a_type) @ [Mips.ADDI (place, place, 0)] @ reg_init @ loop_header @ loop_body @ loop_footer
 
   (* TODO project task 2: see also the comment to replicate.
      (a) `filter(f, arr)`:  has some similarity with the implementation of map.
