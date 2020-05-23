@@ -51,16 +51,26 @@ since each can be time consuming I recomment that you only assign yourself to on
 	- **Finished tasks**
 		- Added parsing and lexing functionality
 		- The Fasto interpreter now supports the ``replicate`` function
-		- Type-checking implemented for REPLICATE and FILTER
+		- Type-checking implemented
 		- MIPS code generation implemented for REPLICATE
 	- **To do**
 		- INTERPRETER: Add support for arrays (see interpreter.fs)
-		- Type checking (SCAN)
-		- Machine code generation / compilation
-		- Thorough testing
-		- Probably more...
 - Add filter
+	- **Finished tasks**
+		- Added parsing and lexing functionality
+		- The Fasto interpreter now supports the ``filter`` function
+		- Type-checking implemented
+	- **To do**
+		- MIPS code generation
+		- Testing
 - Add scan
+	- **Finished tasks**
+		- Added parsing and lexing functionality
+	- **To do**
+		- Add support for ``scan`` in the Fasto interpreter
+		- Type-checking
+		- MIPS code generation
+		- Testing
 
 ### Part 3 - document p. 12
 Optimization part.
