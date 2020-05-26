@@ -655,6 +655,7 @@ let rec compileExp  (e      : TypedExp)
   *)
   | Replicate (n_exp, a_exp, a_type, pos) ->
     // Get the size of one element in 'a'
+    // Use mipsStore/Load?
     let a_elem_size =
       match a_type with
         | Char -> 1
@@ -700,7 +701,8 @@ let rec compileExp  (e      : TypedExp)
                       ]
 
     // n_code @ a_code @ [Mips.ADDI (size_reg, size_reg, 1)] @ dynalloc (size_reg, place, a_type) @ [Mips.ADDI (place, place, 0)] @ reg_init @ loop_header @ loop_body @ loop_footer
-    n_code @ a_code @ dynalloc (size_reg, place, a_type) @ [Mips.ADDI (place, place, 0)] @ reg_init @ loop_header @ loop_body @ loop_footer
+    // n_code @ a_code @ dynalloc (size_reg, place, a_type) @ [Mips.ADDI (place, place, 0)] @ reg_init @ loop_header @ loop_body @ loop_footer
+    n_code @ a_code @ dynalloc (size_reg, place, a_type) @ reg_init @ loop_header @ loop_body @ loop_footer
 
   (* TODO project task 2: see also the comment to replicate.
      (a) `filter(f, arr)`:  has some similarity with the implementation of map.
@@ -717,8 +719,66 @@ let rec compileExp  (e      : TypedExp)
          counter computed in step (c). You do this of course with a
          `Mips.SW(counter_reg, place, 0)` instruction.
   *)
-  | Filter (_, _, _, _) ->
-      failwith "Unimplemented code generation of map"
+  | Filter (farg, arr_exp, elem_type, pos) ->
+      let size_reg = newReg "size_reg" (* size of input/output array *)
+      let arr_reg  = newReg "arr_reg" (* address of array *)
+      let elem_reg = newReg "elem_reg" (* address of single element *)
+      let res_reg = newReg "res_reg"
+      let arr_code = compileExp arr_exp vtable arr_reg
+
+      let counter_reg = newReg "counter_reg"
+
+      let get_size = [ Mips.LW (size_reg, arr_reg, 0) ]
+
+      let addr_reg = newReg "addr_reg" (* address of element in new array *)
+      let i_reg = newReg "i_reg"
+      let init_regs = [ Mips.ADDI (addr_reg, place, 4)
+                      ; Mips.MOVE (i_reg, RZ)
+                      ; Mips.ADDI (elem_reg, arr_reg, 4)
+                      ; Mips.ADDI (counter_reg, RZ, 0)
+                      ]
+      let loop_beg = newLab "loop_beg"
+      let loop_end = newLab "loop_end"
+      let tmp_reg = newReg "tmp_reg"
+      let loop_header = [ Mips.LABEL (loop_beg)
+                        ; Mips.SUB (tmp_reg, i_reg, size_reg)
+                        ; Mips.BGEZ (tmp_reg, loop_end) ]
+      (* map is 'arr[i] = f(old_arr[i])'. *)
+      let src_size = getElemSize elem_type
+      let dst_size = getElemSize elem_type
+
+      let real_res_reg = newReg "real_res_reg"
+      let fun_false = newLab "fun_false"
+
+      let loop_map =
+             // [ mipsLoad src_size (res_reg, elem_reg, 0); Mips.MOVE (real_res_reg, res_reg)
+             [ mipsLoad src_size (res_reg, elem_reg, 0)
+             ; mipsLoad src_size (real_res_reg, elem_reg, 0)
+             ; Mips.ADDI(elem_reg, elem_reg, elemSizeToInt src_size)
+             ]
+             @ applyFunArg(farg, [res_reg], vtable, res_reg, pos)
+             @
+             //[ mipsStore dst_size (res_reg, addr_reg, 0)
+             [ Mips.BEQ (res_reg, RZ, fun_false)
+             ; mipsStore dst_size (real_res_reg, addr_reg, 0)
+             ; Mips.ADDI (counter_reg, counter_reg, 1)
+             ; Mips.LABEL fun_false
+             ; Mips.ADDI (addr_reg, addr_reg, elemSizeToInt dst_size)
+             ]
+
+      let loop_footer =
+              [ Mips.ADDI (i_reg, i_reg, 1)
+              ; Mips.J loop_beg
+              ; Mips.LABEL loop_end
+              ; Mips.SW(counter_reg, place, 0)
+              ]
+      arr_code
+       @ get_size
+       @ dynalloc (size_reg, place, elem_type)
+       @ init_regs
+       @ loop_header
+       @ loop_map
+       @ loop_footer
 
   (* TODO project task 2: see also the comment to replicate.
      `scan(f, ne, arr)`: you can inspire yourself from the implementation of
