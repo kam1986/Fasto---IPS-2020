@@ -743,28 +743,24 @@ let rec compileExp  (e      : TypedExp)
       let loop_header = [ Mips.LABEL (loop_beg)
                         ; Mips.SUB (tmp_reg, i_reg, size_reg)
                         ; Mips.BGEZ (tmp_reg, loop_end) ]
-      (* map is 'arr[i] = f(old_arr[i])'. *)
       let src_size = getElemSize elem_type
       let dst_size = getElemSize elem_type
 
       let real_res_reg = newReg "real_res_reg"
       let fun_false = newLab "fun_false"
 
-      let loop_map =
-             // [ mipsLoad src_size (res_reg, elem_reg, 0); Mips.MOVE (real_res_reg, res_reg)
+      let loop_filter =
              [ mipsLoad src_size (res_reg, elem_reg, 0)
              ; mipsLoad src_size (real_res_reg, elem_reg, 0)
              ; Mips.ADDI(elem_reg, elem_reg, elemSizeToInt src_size)
              ]
              @ applyFunArg(farg, [res_reg], vtable, res_reg, pos)
              @
-             //[ mipsStore dst_size (res_reg, addr_reg, 0)
              [ Mips.BEQ (res_reg, RZ, fun_false)
-             //; mipsStore dst_size (real_res_reg, addr_reg, 0)
              ; mipsStore dst_size (real_res_reg, addr_reg, 0)
              ; Mips.ADDI (counter_reg, counter_reg, 1)
-             ; Mips.LABEL fun_false
              ; Mips.ADDI (addr_reg, addr_reg, elemSizeToInt dst_size)
+             ; Mips.LABEL fun_false
              ]
 
       let loop_footer =
@@ -778,7 +774,7 @@ let rec compileExp  (e      : TypedExp)
        @ dynalloc (size_reg, place, elem_type)
        @ init_regs
        @ loop_header
-       @ loop_map
+       @ loop_filter
        @ loop_footer
 
   (* TODO project task 2: see also the comment to replicate.

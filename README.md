@@ -60,7 +60,6 @@ since each can be time consuming I recomment that you only assign yourself to on
 		- Added parsing and lexing functionality
 		- The Fasto interpreter now supports the ``filter`` function
 		- Type-checking implemented
-	- **To do**
 		- MIPS code generation
 		- Testing
 - Add scan
