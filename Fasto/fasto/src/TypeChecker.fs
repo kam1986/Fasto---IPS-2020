@@ -345,7 +345,7 @@ and checkExp  (ftab : FunTable)
         if f_res_type <> Bool then
           reportTypeWrongKind "function result" "bool" f_res_type pos
 
-        (Array f_res_type, Filter (f', arr_exp_dec, elem_type, pos))
+        (Array elem_type, Filter (f', arr_exp_dec, elem_type, pos))
 
     (* TODO project task 2: `scan(f, ne, arr)`
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.

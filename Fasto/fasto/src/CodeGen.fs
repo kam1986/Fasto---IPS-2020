@@ -760,6 +760,7 @@ let rec compileExp  (e      : TypedExp)
              @
              //[ mipsStore dst_size (res_reg, addr_reg, 0)
              [ Mips.BEQ (res_reg, RZ, fun_false)
+             //; mipsStore dst_size (real_res_reg, addr_reg, 0)
              ; mipsStore dst_size (real_res_reg, addr_reg, 0)
              ; Mips.ADDI (counter_reg, counter_reg, 1)
              ; Mips.LABEL fun_false
