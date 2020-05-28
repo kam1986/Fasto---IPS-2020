@@ -16,15 +16,25 @@ let calls (caller : string)
 
 open AbSyn
 
-
+(* 
+    remove doublicate in O(n lg n) 
+    i.e. sets are binary trees with no doublicates
+    size it takes O(lg n) time to insert and there is n element
+    the first step takes O(n lg n) time.
+    the next step simply 
+*)
+let rec nub lst = 
+    set lst
+    |> Set.toList
+// old code
 (* Remove duplicate elements in a list. Quite slow - O(n^2) -
    but our lists here will be small. *)
-let rec nub = function
+(* function
     | []    -> []
     | x::xs -> if List.exists (fun y -> y = x) xs
                then nub xs
                else x :: nub xs
-
+*)
 let rec expCalls = function
     | Constant _ -> []
     | StringLit _ -> []
