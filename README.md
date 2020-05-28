@@ -66,7 +66,6 @@ since each can be time consuming I recomment that you only assign yourself to on
 	- **Finished tasks**
 		- Added parsing and lexing functionality
 		- Add support for ``scan`` in the Fasto interpreter
-	- **To do**
 		- Type-checking
 		- MIPS code generation
 		- Testing
