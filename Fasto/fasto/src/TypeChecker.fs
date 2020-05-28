@@ -378,7 +378,7 @@ and checkExp  (ftab : FunTable)
         if e_type <> f_argres_type then
           reportTypesDifferent "operation and start-element types in scan"
                                f_argres_type e_type pos
-        (ArrVal f_argres_type, Reduce (f', e_dec, arr_dec, elem_type, pos))
+        (Array f_argres_type, Scan (f', e_dec, arr_dec, elem_type, pos))
 
 and checkFunArg  (ftab : FunTable)
                  (vtab : VarTable)
