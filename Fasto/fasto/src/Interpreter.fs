@@ -192,7 +192,7 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         | BoolVal _ -> 
            let res2   = evalExp(e2, vtab, ftab)
            match res2 with
-           | BoolVal true -> res1
+           | BoolVal _ -> res2
            | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
         | _ ->  invalidOperand "Or on non-boolean arg: " Bool res1 pos
   | Not(e, pos) ->

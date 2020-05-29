@@ -72,6 +72,7 @@ let keyword (s, pos) =
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
        | "write"        -> Parser.WRITE pos
+       | "not"          -> Parser.NOT pos
        | _              -> Parser.ID (s, pos)
 
 }
@@ -112,12 +113,14 @@ rule Token = parse
   | '~'                   { Parser.NEG (getPos lexbuf) }
   | "||"                  { Parser.OR (getPos lexbuf) }
   | "&&"                  { Parser.AND (getPos lexbuf) }
-  | "not"                 { Parser.NOT (getPos lexbuf) }
   (* Task 1 part b *)
   | ';'                   { Parser.SEMICOLON (getPos lexbuf) }
 
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
+  (* Task 4 *)
+  | "<-"                  { Parser.BACKARROW (getPos lexbuf) }
+  | '|'                   { Parser.BAR (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }
   | '<'                   { Parser.LTH    (getPos lexbuf) }
   | '('                   { Parser.LPAR   (getPos lexbuf) }

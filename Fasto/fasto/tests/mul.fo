@@ -1,0 +1,5 @@
+
+fun bool main() =
+    let x = write(2*2 == 2+2) in
+    let x = write(~1*~1 == 1) in
+    write(1*0 == 0)
