@@ -22,7 +22,7 @@ let parse_error_rich =
       Dec of string * Exp<'T> * Position
       Let of Dec<'T> * Exp<'T> * Position
 *)
-let rec LetBuilder (indexlist : string list) ret pos =
+(*let rec LetBuilder (indexlist : string list) ret pos =
       match indexlist with
       | [] -> ret
       | i :: indices ->
@@ -30,7 +30,7 @@ let rec LetBuilder (indexlist : string list) ret pos =
                   Dec("indexOf" + i, , pos),
                   ,
 
-            )
+            )*)
 %}
 
 //////////////////////////////////////////////////////////////////////
@@ -156,9 +156,9 @@ BinOp : PLUS  { (Lambda
 
 // Task 1 part 2
 MulIn : SEMICOLON ID EQ Exp MulIn %prec letprec
-        { Let (Dec (fst $2, $4, $3), $5, $1)}
+            { Let (Dec (fst $2, $4, $3), $5, $1)}
       | IN Exp 
-        { $2 }
+            { $2 }
 
 
 ///////////////////////////////////////////////////////
@@ -168,53 +168,53 @@ MulIn : SEMICOLON ID EQ Exp MulIn %prec letprec
 
 
 // return the tuple of the type and the
-CphRes : Type ID EQ Exp
-        { (((fst $2, $1), Lambda($1, [Param(fst $2, $1)], $4, $3)) }
-;
+//CphRes : Type ID EQ Exp
+//        { (((fst $2, $1), Lambda($1, [Param(fst $2, $1)], $4, $3)) }
+//;
 
 // get pairs of identifiers to be used later
 // (index, array name)
-CphInps : ID BACKARROW ID SEMICOLON CphInps      
-      { ($1, $3) :: $5 }
-      | ID BACKARROW ID 
-      { [($1, $3)] }
-;
+//CphInps : ID BACKARROW ID SEMICOLON CphInps      
+//      { ($1, $3) :: $5 }
+//      | ID BACKARROW ID 
+//      { [($1, $3)] }
+//;*)
 
 
 // Map (func, input, input type, return type, pos)
 // Filter (pred, input, type, pos)
 // Lambda (type, args, body, pos)
 //            1      2    3  4      5       6       7         8     9     10
-Compreh : LBRACKET Type Exp BAR CphInps SEMICOLON CphRes SEMICOLON Exp RBRACKET
-            { Map(
-                  Lambda($2, [Param(fst $7)], $3, $2), 
-                        Filter(
-                              Lambda(),
-                              Map($7, Iota(List.fold ( fun sz arg -> Times(sz, Apply("length", [Var(arg,)], pos))) (Constant (IntVal 1) (List.map snd %5))), 
-                              $1
-                              ),
-                              
-                              )
-                  ) 
-            }
+//Compreh : LBRACKET Type Exp BAR CphInps SEMICOLON CphRes SEMICOLON Exp RBRACKET
+//            { Map(
+//                  Lambda($2, [Param(fst $7)], $3, $2), 
+//                        Filter(
+//                              Lambda(),
+//                              Map($7, Iota(List.fold ( fun sz arg -> Times(sz, Apply("length", [Var(arg,)], pos))) (Constant (IntVal 1) (List.map snd %5))), 
+//                              $1
+//                              ),
+//                              
+//                              )
+//                  ) 
+//            }
       //    1      2   3   4      5      6        7       8
-      | LBRACKET Type Exp BAR CphInps SEMICOLON CphRes RBRACKET
-            { Map(
+//      | LBRACKET Type Exp BAR CphInps SEMICOLON CphRes RBRACKET
+//            { Map(
                   // $2 are the rtp, fst $7 are a tuple of string*Type, $3 are the body (Exp), $2 are the position.
-                  Lambda($2,[Param(fst $7)],$3,$2),
-                  Map(
-                        snd $7,
-                        Iota( // create new array
-                              List.map snd %5 // get array names for all arrays
+//                  Lambda($2,[Param(fst $7)],$3,$2),
+//                  Map(
+//                        snd $7,
+//                        Iota( // create new array
+//                              List.map snd %5 // get array names for all arrays
                               // get the length of alle arrays and multiply them together.
-                              |> List.fold ( fun sz arr -> Times(sz, Apply("length", [Var(arr, $6)], $6))) (Constant (IntVal 1)), 
-                              $1
-                        )
-                  ),
-                  $1
-                  )
-            }
-;
+//                              |> List.fold ( fun sz arr -> Times(sz, Apply("length", [Var(arr, $6)], $6))) (Constant (IntVal 1)), 
+//                              $1
+//                        )
+//                  ),
+//                  $1
+//                  )
+//            }
+//;
 
 Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | CHARLIT        { Constant (CharVal (fst $1), snd $1) }
