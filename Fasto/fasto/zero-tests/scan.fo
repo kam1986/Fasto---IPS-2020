@@ -1,0 +1,8 @@
+fun int write_int(int x) = write(x)
+fun int plus (int x, int y) = x + y
+
+fun [int] write_int_arr([int] x) = map(write_int, x)
+
+fun [int] main() =
+  let arr = scan(plus, 0, iota(0)) in
+    write_int_arr(arr)
