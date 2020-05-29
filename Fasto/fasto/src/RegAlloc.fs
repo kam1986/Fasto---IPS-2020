@@ -44,72 +44,74 @@ exception MyError of string
 
 exception Not_colourable of string
 
-let spilledVars : Set<string> ref = ref (Set.empty)
 
-let rec destRegs (lst : Instruction list) : Set<reg> =
+
+let spilledVars : Set<string> ref = ref Set.empty
+
+let rec destRegs (lst : Instruction list) : reg Set =
   match lst with
     | [] -> Set.empty
-    | (i::ilist) -> Set.union (destReg i) (destRegs ilist)
+    | (i::ilist) -> (destReg i) + (destRegs ilist)
 
 
 (* variables and registers that can be overwritten *)
-and destReg (i : Instruction) : Set<reg> =
+and destReg (i : Instruction) : reg Set =
   match i with
-  | LA (rt,v)      -> Set.singleton rt
-  | LUI (rt,v)     -> Set.singleton rt
-  | ADD (rd,rs,rt) -> Set.singleton rd
-  | ADDI (rd,rs,v) -> Set.singleton rd
-  | SUB (rd,rs,rt) -> Set.singleton rd
-  | MUL (rd,rs,rt) -> Set.singleton rd
-  | DIV (rd,rs,rt) -> Set.singleton rd
-  | AND (rd,rs,rt) -> Set.singleton rd
-  | ANDI (rd,rs,v) -> Set.singleton rd
-  | OR (rd,rs,rt)  -> Set.singleton rd
-  | ORI (rd,rs,v)  -> Set.singleton rd
-  | XOR (rd,rs,rt) -> Set.singleton rd
-  | XORI (rd,rs,v) -> Set.singleton rd
-  | SLL (rd,rt,v)  -> Set.singleton rd
-  | SRA (rd,rt,v)  -> Set.singleton rd
-  | SLT (rd,rs,rt) -> Set.singleton rd
-  | SLTI (rd,rs,v) -> Set.singleton rd
-  | JAL (lab,argRegs) -> Set.add (RN 31) (Set.ofList argRegs)
-  | LW (rd,rs,v)   -> Set.singleton rd
-  | LB (rd,rs,v)   -> Set.singleton rd
+  | LA (rt,v)      -> set[rt]
+  | LUI (rt,v)     -> set[rt]
+  | ADD (rd,rs,rt) -> set[rd]
+  | ADDI (rd,rs,v) -> set[rd]
+  | SUB (rd,rs,rt) -> set[rd]
+  | MUL (rd,rs,rt) -> set[rd]
+  | DIV (rd,rs,rt) -> set[rd]
+  | AND (rd,rs,rt) -> set[rd]
+  | ANDI (rd,rs,v) -> set[rd]
+  | OR (rd,rs,rt)  -> set[rd]
+  | ORI (rd,rs,v)  -> set[rd]
+  | XOR (rd,rs,rt) -> set[rd]
+  | XORI (rd,rs,v) -> set[rd]
+  | SLL (rd,rt,v)  -> set[rd]
+  | SRA (rd,rt,v)  -> set[rd]
+  | SLT (rd,rs,rt) -> set[rd]
+  | SLTI (rd,rs,v) -> set[rd]
+  | JAL (lab,argRegs) -> Set.add (RN 31) (set argRegs) // 
+  | LW (rd,rs,v)   -> set[rd]
+  | LB (rd,rs,v)   -> set[rd]
   | SYSCALL        -> Set.singleton (RN 2) (* return value is in $2 *)
   | _ -> Set.empty
 
 (* variables and register that can be read by i *)
-let usedRegs (i : Instruction) : Set<reg> =
+let usedRegs (i : Instruction) : reg Set =
   match i with
-  | ADD (rd,rs,rt) -> Set.ofList [rs;rt]
-  | ADDI (rd,rs,v) -> Set.singleton rs
-  | SUB (rd,rs,rt) -> Set.ofList [rs;rt]
-  | MUL (rd,rs,rt) -> Set.ofList [rs;rt]
-  | DIV (rd,rs,rt) -> Set.ofList [rs;rt]
-  | AND (rd,rs,rt) -> Set.ofList [rs;rt]
-  | ANDI (rd,rs,v) -> Set.singleton rs
-  | OR (rd,rs,rt) -> Set.ofList [rs;rt]
-  | ORI (rd,rs,v) -> Set.singleton rs
-  | XOR (rd,rs,rt) -> Set.ofList [rs;rt]
-  | XORI (rd,rs,v) -> Set.singleton rs
+  | ADD (rd,rs,rt) -> set[rs;rt]
+  | ADDI (rd,rs,v) -> set [rs]
+  | SUB (rd,rs,rt) -> set [rs;rt]
+  | MUL (rd,rs,rt) -> set [rs;rt]
+  | DIV (rd,rs,rt) -> set [rs;rt]
+  | AND (rd,rs,rt) -> set [rs;rt]
+  | ANDI (rd,rs,v) -> set[rs]
+  | OR (rd,rs,rt) -> set [rs;rt]
+  | ORI (rd,rs,v) -> set[rs]
+  | XOR (rd,rs,rt) -> set [rs;rt]
+  | XORI (rd,rs,v) -> set[rs]
   | SLL (rd,rt,v) -> Set.singleton rt
   | SRA (rd,rt,v) -> Set.singleton rt
-  | SLT (rd,rs,rt) -> Set.ofList [rs;rt]
-  | SLTI (rd,rs,v) -> Set.singleton rs
-  | BEQ (rs,rt,v) -> Set.ofList [rs;rt]
-  | BNE (rs,rt,v) -> Set.ofList [rs;rt]
-  | BGEZ (rs,v) -> Set.singleton rs
+  | SLT (rd,rs,rt) -> set [rs;rt]
+  | SLTI (rd,rs,v) -> set[rs]
+  | BEQ (rs,rt,v) -> set [rs;rt]
+  | BNE (rs,rt,v) -> set [rs;rt]
+  | BGEZ (rs,v) -> set[rs]
   | J lab -> Set.empty
-  | JAL (lab,argRegs) -> Set.ofList argRegs
+  | JAL (lab,argRegs) -> set argRegs
                 (* argRegs are argument registers *)
-  | JR (r,resRegs) -> Set.ofList (r::resRegs)
+  | JR (r,resRegs) -> set (r::resRegs)
                 (* r is jump register,
                    resRegs are registers required to be live *)
-  | LW (rd,rs,v) -> Set.singleton rs
-  | SW (rd,rs,v) -> Set.ofList [rs;rd]
-  | LB (rd,rs,v) -> Set.singleton rs
-  | SB (rd,rs,v) -> Set.ofList [rs;rd]
-  | SYSCALL -> Set.ofList [RN 2; RN 4; RN 5]
+  | LW (rd,rs,v) -> set[rs]
+  | SW (rd,rs,v) -> set [rs;rd]
+  | LB (rd,rs,v) -> set[rs]
+  | SB (rd,rs,v) -> set [rs;rd]
+  | SYSCALL -> set [RN 2; RN 4; RN 5]
                 (* $2 is control register and $4, $5 are arguments *)
   | _ -> Set.empty
 
@@ -125,19 +127,19 @@ let live_step ilist llist liveAtEnd =
           else (instruct i (List.head ls1)) :: ls1
 
    (* live variables and registers *)
-  and instruct (i : Instruction) (live : Set<reg>) : Set<reg> =
+  and instruct (i : Instruction) (live : reg Set) : reg Set =
     match i with
-      | BEQ (rs,rt,v) -> Set.union (Set.ofList [rs;rt]) (Set.union live (live_at v))
-      | BNE (rs,rt,v) -> Set.union (Set.ofList [rs;rt]) (Set.union live (live_at v))
-      | BGEZ (rs,v)   -> Set.union (Set.singleton rs)   (Set.union live (live_at v))
+      | BEQ (rs,rt,v) -> (set [rs;rt]) + (live + (live_at v))
+      | BNE (rs,rt,v) -> (set [rs;rt]) + (live + (live_at v))
+      | BGEZ (rs,v)   -> (set[rs]) + (live + (live_at v))
       | J lab -> live_at lab
-      | JR (r,resRegs) -> Set.ofList (r::resRegs)
+      | JR (r,resRegs) -> set (r::resRegs)
               (* r is jump register, resRegs are registers required to be live *)
-      | _ -> Set.union (usedRegs i) (Set.difference live (destReg i))
+      | _ -> (usedRegs i) + (live - (destReg i))
 
-  and live_at lab : Set<reg> = search ilist llist lab
+  and live_at lab : reg Set = search ilist llist lab
 
-  and search a1 a2 a3 : Set<reg> =
+  and search a1 a2 a3 : reg Set =
     match (a1, a2, a3) with
       | ([], [], lab) -> Set.empty
       | (LABEL k :: is, l::ls, lab) ->
@@ -164,7 +166,7 @@ let rec init_list = function
 let live_regs ilist liveAtEnd =
       iterate_live ilist (init_list ilist) liveAtEnd
 
-let rec regs lst (rs : Set<reg>) : Set<reg> =
+let rec regs lst (rs : reg Set) : reg Set =
   match lst with
     | [] -> rs
     | (l :: llist) -> Set.union l (regs llist rs)
@@ -235,8 +237,8 @@ let rec findMoves ilist llist =
 and findMoves1 r = function
   | [] -> Set.empty
   | (ORI (rd,rs,0) :: ilist) ->
-      Set.union  ( if   rd=r then Set.singleton rs
-                   elif rs=r then Set.singleton rd
+      Set.union  ( if   rd=r then set[rs]
+                   elif rs=r then set[rd]
                    else Set.empty)
                  (findMoves1 r ilist)
   | (i::ilist) -> findMoves1 r ilist
@@ -325,7 +327,7 @@ and select rcl regs moveRelated sl =
                  else Set.minElement mPossible //hd mPossible
         select l regs moveRelated ((r,rnum)::sl)
 
-and NotIn rcs sl regs : Set<reg> =
+and NotIn rcs sl regs : reg Set =
     Set.fold (fun acc r -> Set.remove (lookUp r sl) acc) regs rcs
 
 and lookUp r = function
@@ -338,7 +340,7 @@ and lookUp2 r = function
     | [] -> Set.empty
     | ((r1,ms)::sl) -> if r=r1 then ms else lookUp2 r sl
 
-and mList m n : Set<reg> =
+and mList m n : reg Set =
   if m > n then Set.empty
   else Set.add (RN m) (mList (m+1) n)
 
@@ -460,12 +462,12 @@ let rec maxreg lst m =
    spilled is number of registers spilled so far -- should be 0 initially
 *)
 let rec registerAlloc (ilist : Mips.Instruction list)
-                      (liveAtEnd : Set<reg>)
+                      (liveAtEnd : reg Set)
                       (rmin : int)
                       (callerMax : int)
                       (rmax : int)
                       (spilled : int)
-                    : (Mips.Instruction list * Set<reg> * int * int) =
+                    : (Mips.Instruction list * reg Set * int * int) =
   try
     let llist = live_regs ilist liveAtEnd
     let callerSaves = mList rmin callerMax
@@ -473,7 +475,7 @@ let rec registerAlloc (ilist : Mips.Instruction list)
     let moveRelated = findMoves ilist llist
     let allocs = colourGraph iGraph rmin rmax moveRelated
     let deadRegs = Set.difference (filterSymbolic (destRegs ilist))
-                                  ( (List.map (fun (x,_) -> x) allocs) |> Set.ofList )
+                                  ( (List.map (fun (x,_) -> x) allocs) |> set )
     let allocs1 = allocs @ (List.map (fun r -> (r, RN 0)) (Set.toList deadRegs))
     let ilist1 = filterNullMoves ilist allocs1
     let ilist2 = List.concat (List.map (renameReg allocs1) ilist1)

@@ -65,6 +65,7 @@ let keyword (s, pos) =
        | "op"           -> Parser.OP pos
        | "true"         -> Parser.BOOLLIT (true, pos)
        | "false"        -> Parser.BOOLLIT (false, pos)
+       | "not"          -> Parser.NOT pos
 
 (* specials: *)
        | "iota"         -> Parser.IOTA pos
@@ -76,6 +77,7 @@ let keyword (s, pos) =
        | "replicate"    -> Parser.REPLICATE pos
        | "filter"       -> Parser.FILTER pos
        | "scan"         -> Parser.SCAN pos
+
        | _              -> Parser.ID (s, pos)
 
 }
@@ -116,12 +118,14 @@ rule Token = parse
   | '~'                   { Parser.NEG (getPos lexbuf) }
   | "||"                  { Parser.OR (getPos lexbuf) }
   | "&&"                  { Parser.AND (getPos lexbuf) }
-  | "not"                 { Parser.NOT (getPos lexbuf) }
   (* Task 1 part b *)
   | ';'                   { Parser.SEMICOLON (getPos lexbuf) }
 
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
+  (* Task 4 *)
+  | "<-"                  { Parser.BACKARROW (getPos lexbuf) }
+  | '|'                   { Parser.BAR (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }
   | '<'                   { Parser.LTH    (getPos lexbuf) }
   | '('                   { Parser.LPAR   (getPos lexbuf) }

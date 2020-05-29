@@ -17,6 +17,20 @@ let parse_error_rich =
       | Some token -> sprintf "at token %A\n" token
   )
 
+// helper function for setting up array comprehension
+(*
+      Dec of string * Exp<'T> * Position
+      Let of Dec<'T> * Exp<'T> * Position
+*)
+(*let rec LetBuilder (indexlist : string list) ret pos =
+      match indexlist with
+      | [] -> ret
+      | i :: indices ->
+            Let (
+                  Dec("indexOf" + i, , pos),
+                  ,
+
+            )*)
 %}
 
 //////////////////////////////////////////////////////////////////////
@@ -41,6 +55,7 @@ let parse_error_rich =
 %token <bool*(int*int)> BOOLLIT
 %token <char*(int*int)> CHARLIT
 %token <string*(int*int)> ID STRINGLIT
+%token <int*int> BACKARROW
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS
@@ -48,7 +63,7 @@ let parse_error_rich =
 %token <(int*int)> AND OR
 %token <(int*int)> NOT NEG
 %token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW REPLICATE FILTER SCAN
-%token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
+%token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE BAR
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
@@ -103,19 +118,103 @@ BinOp : PLUS  { (Lambda
                         Plus (Var ("x", $1),
                               Var ("y", $1),
                                         $1) ,$1))}
+        // Added missing BinOps 
+      | MINUS { (Lambda
+                       (Int, [Param ("x", Int);
+                              Param ("y", Int)],
+                        Minus (Var ("x", $1),
+                              Var ("y", $1),
+                                        $1) ,$1))}
+      | TIMES  { (Lambda
+                       (Int, [Param ("x", Int);
+                              Param ("y", Int)],
+                        Times (Var ("x", $1),
+                              Var ("y", $1),
+                                        $1) ,$1))}
+
+      | DIVIDE  { (Lambda
+                       (Int, [Param ("x", Int);
+                              Param ("y", Int)],
+                        Divide (Var ("x", $1),
+                              Var ("y", $1),
+                                        $1) ,$1))}
+
+      | AND  { (Lambda
+                       (Bool, [Param ("x", Bool);
+                              Param ("y", Bool)],
+                        And (Var ("x", $1),
+                              Var ("y", $1),
+                                        $1) ,$1))}
+      | OR  { (Lambda
+                       (Bool, [Param ("x", Bool);
+                              Param ("y", Bool)],
+                        Or (Var ("x", $1),
+                              Var ("y", $1),
+                                        $1) ,$1))}
 ;
 
 // Task 1 part 2
 MulIn : SEMICOLON ID EQ Exp MulIn %prec letprec
-        { Let (Dec (fst $2, $4, $3), $5, $1)}
-      | IN Exp
-        { $2 }
+            { Let (Dec (fst $2, $4, $3), $5, $1)}
+      | IN Exp 
+            { $2 }
+
 
 
 ///////////////////////////////////////////////////////
 // TODO: project tasks 1,2,4:
 //       add grammer rules for the new expressions
 ///////////////////////////////////////////////////////
+
+
+// return the tuple of the type and the
+//CphRes : Type ID EQ Exp
+//        { (((fst $2, $1), Lambda($1, [Param(fst $2, $1)], $4, $3)) }
+//;
+
+// get pairs of identifiers to be used later
+// (index, array name)
+//CphInps : ID BACKARROW ID SEMICOLON CphInps      
+//      { ($1, $3) :: $5 }
+//      | ID BACKARROW ID 
+//      { [($1, $3)] }
+//;*)
+
+
+// Map (func, input, input type, return type, pos)
+// Filter (pred, input, type, pos)
+// Lambda (type, args, body, pos)
+//            1      2    3  4      5       6       7         8     9     10
+//Compreh : LBRACKET Type Exp BAR CphInps SEMICOLON CphRes SEMICOLON Exp RBRACKET
+//            { Map(
+//                  Lambda($2, [Param(fst $7)], $3, $2), 
+//                        Filter(
+//                              Lambda(),
+//                              Map($7, Iota(List.fold ( fun sz arg -> Times(sz, Apply("length", [Var(arg,)], pos))) (Constant (IntVal 1) (List.map snd %5))), 
+//                              $1
+//                              ),
+//                              
+//                              )
+//                  ) 
+//            }
+      //    1      2   3   4      5      6        7       8
+//      | LBRACKET Type Exp BAR CphInps SEMICOLON CphRes RBRACKET
+//            { Map(
+                  // $2 are the rtp, fst $7 are a tuple of string*Type, $3 are the body (Exp), $2 are the position.
+//                  Lambda($2,[Param(fst $7)],$3,$2),
+//                  Map(
+//                        snd $7,
+//                        Iota( // create new array
+//                              List.map snd %5 // get array names for all arrays
+                              // get the length of alle arrays and multiply them together.
+//                              |> List.fold ( fun sz arr -> Times(sz, Apply("length", [Var(arr, $6)], $6))) (Constant (IntVal 1)), 
+//                              $1
+//                        )
+//                  ),
+//                  $1
+//                  )
+//            }
+//;
 
 Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | CHARLIT        { Constant (CharVal (fst $1), snd $1) }

@@ -182,8 +182,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         | BoolVal _ -> // short curcuit part
             let res2 = evalExp(e2, vtab, ftab)
             match res2 with
-            | BoolVal false -> res1
-            | _ -> invalidOperands "And on non-boolean args: " [(Bool, Bool)] res1 res2 pos
+            | BoolVal _ -> res2
+            | _ -> invalidOperands "And on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
         | _ ->  invalidOperand "And on non-boolean arg: " Bool res1 pos
   | Or (e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
@@ -192,8 +192,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         | BoolVal _ ->
            let res2   = evalExp(e2, vtab, ftab)
            match res2 with
-           | BoolVal true -> res1
-           | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos
+           | BoolVal _ -> res2
+           | _ -> invalidOperands "Or on non-boolean args: " [(Bool, Bool)] res1 res2 pos 
         | _ ->  invalidOperand "Or on non-boolean arg: " Bool res1 pos
   | Not(e, pos) ->
     let res1 = evalExp(e, vtab, ftab)
@@ -203,7 +203,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
   | Negate(e, pos) ->
     let res1 = evalExp(e, vtab, ftab)
     match res1 with
-    | IntVal n -> -n |> IntVal
+    | IntVal n -> 
+        IntVal -n
     | _ -> invalidOperand "Negate on non-integral arg: " Int res1 pos
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)

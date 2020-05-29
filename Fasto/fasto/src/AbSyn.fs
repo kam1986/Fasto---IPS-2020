@@ -258,31 +258,31 @@ let ppFun d = function
 let ppProg (p : Prog<'T>) = (String.concat "\n\n" (List.map (ppFun 0) p)) + "\n"
 
 let expPos = function
-  | Constant (_, p) -> p
-  | StringLit (_, p) -> p
-  | ArrayLit (_, _, p) -> p
-  | Var (_, p) -> p
-  | Plus (_, _, p) -> p
-  | Minus (_, _, p) -> p
-  | Equal (_, _, p) -> p
-  | Less (_, _, p) -> p
-  | If (_, _, _, p) -> p
-  | Apply (_, _, p) -> p
-  | Let (_, _, p) -> p
-  | Index (_, _, _, p) -> p
-  | Iota (_, p) -> p
-  | Replicate (_, _, _, p) -> p
-  | Map (_, _, _, _, p) -> p
-  | Filter (_, _, _, p) -> p
-  | Reduce (_, _, _, _, p) -> p
-  | Scan (_, _, _, _, p) -> p
-  | Read (_, p) -> p
-  | Write (_, _, p) -> p
-  | Times (_, _, p) -> p
-  | Divide (_, _, p) -> p
-  | And (_, _, p) -> p
-  | Or (_, _, p) -> p
-  | Not (_, p) -> p
+  | Constant (_, p) 
+  | StringLit (_, p) 
+  | ArrayLit (_, _, p) 
+  | Var (_, p) 
+  | Plus (_, _, p) 
+  | Minus (_, _, p) 
+  | Equal (_, _, p) 
+  | Less (_, _, p) 
+  | If (_, _, _, p) 
+  | Apply (_, _, p) 
+  | Let (_, _, p) 
+  | Index (_, _, _, p) 
+  | Iota (_, p) 
+  | Replicate (_, _, _, p)
+  | Map (_, _, _, _, p) 
+  | Filter (_, _, _, p) 
+  | Reduce (_, _, _, _, p) 
+  | Scan (_, _, _, _, p) 
+  | Read (_, p) 
+  | Write (_, _, p) 
+  | Times (_, _, p) 
+  | Divide (_, _, p) 
+  | And (_, _, p) 
+  | Or (_, _, p) 
+  | Not (_, p) 
   | Negate (_, p) -> p
 
 
